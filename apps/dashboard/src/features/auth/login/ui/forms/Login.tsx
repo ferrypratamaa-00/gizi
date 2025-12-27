@@ -74,9 +74,6 @@ export const LoginForm = () => {
                         </Button>
                     )}
                 />
-                <Button variant="destructive">
-                    button
-                </Button>
             </FieldGroup>
         </form>
     )
