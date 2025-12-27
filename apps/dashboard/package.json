@@ -10,7 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@repo/ui": "*",
+    "@repo/ui": "workspace:*",
+    "@repo/schema": "workspace:*",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-form": "^1.27.6",
     "@tanstack/react-router": "^1.143.11",
