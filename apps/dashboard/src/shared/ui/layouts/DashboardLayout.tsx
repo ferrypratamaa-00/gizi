@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NavbarMenu } from './NavbarMenu'
+import { appEnv } from '@/shared/utils/appEnv'
 
 interface DashboardLayoutProps {
     children: ReactNode
@@ -11,13 +12,13 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Sidebar Sederhana */}
             <aside className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
                 <div className="p-6 border-b border-gray-200">
-                    <h1 className="font-bold text-xl text-gray-800">Gizi Dashboard</h1>
+                    <h1 className="font-bold text-xl text-gray-800">{appEnv.APP_NAME} Dashboard</h1>
                 </div>
 
                 <NavbarMenu />
 
                 <div className="p-4 border-t border-gray-200">
-                    <div className="text-xs text-gray-400">© 2024 Gizi App</div>
+                    <div className="text-xs text-gray-400">© 2024 {appEnv.APP_NAME} App</div>
                 </div>
             </aside>
 

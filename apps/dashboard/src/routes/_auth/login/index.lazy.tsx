@@ -2,6 +2,7 @@ import { createLazyFileRoute } from '@tanstack/react-router'
 import { LoginForm } from '@/features/auth/login/ui/forms/Login'
 import { Logo } from '@/features/auth/login/ui/components/Logo'
 import { NutritionCard } from '@/features/auth/login/ui/components/NutritionCard'
+import { appEnv } from '@/shared/utils/appEnv'
 
 export const Route = createLazyFileRoute('/_auth/login/')({
   component: RouteComponent,
@@ -20,7 +21,7 @@ function RouteComponent() {
         </div>
         {/* Footer */}
         <div className='absolute bottom-8 text-sm text-gray-500'>
-            &copy; 2025 Gizi Platform. All rights reserved.
+            &copy; 2025 {appEnv.APP_NAME} Platform. All rights reserved.
         </div>
       </div>
 
