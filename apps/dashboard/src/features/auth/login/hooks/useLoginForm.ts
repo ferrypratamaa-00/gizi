@@ -1,20 +1,19 @@
-import { loginSchema, type LoginPayload } from "@repo/schema"
+import { loginSchema } from "@repo/schema"
 import { useForm } from "@tanstack/react-form"
 
 export const useLoginForm = () => {
-    const form = useForm<LoginPayload>({
+    const form = useForm({
         defaultValues: {
             email: '',
             password: ''
         },
-        validatorAdapter: zodValidator(),
         validators: {
             onChange: loginSchema
         },
-        onSubmit: async ({ values }) => {
-            console.log(values)
+        onSubmit: async ({ value }) => {
+            console.log(value)
         }
     })
 
-    return form
+    return { form }
 }
