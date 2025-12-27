@@ -15,9 +15,9 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteImport } from './routes/_dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 
-const LoginIndexLazyRouteImport = createFileRoute('/login/')()
 const DashboardUsersIndexLazyRouteImport =
   createFileRoute('/_dashboard/users/')()
+const AuthLoginIndexLazyRouteImport = createFileRoute('/_auth/login/')()
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -33,11 +33,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginIndexLazyRoute = LoginIndexLazyRouteImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRouteImport,
-} as any).lazy(() => import('./routes/login/index.lazy').then((d) => d.Route))
 const DashboardUsersIndexLazyRoute = DashboardUsersIndexLazyRouteImport.update({
   id: '/users/',
   path: '/users/',
@@ -45,17 +40,24 @@ const DashboardUsersIndexLazyRoute = DashboardUsersIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_dashboard/users/index.lazy').then((d) => d.Route),
 )
+const AuthLoginIndexLazyRoute = AuthLoginIndexLazyRouteImport.update({
+  id: '/_auth/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any).lazy(() =>
+  import('./routes/_auth/login/index.lazy').then((d) => d.Route),
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/login': typeof LoginIndexLazyRoute
+  '/login': typeof AuthLoginIndexLazyRoute
   '/users': typeof DashboardUsersIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/login': typeof LoginIndexLazyRoute
+  '/login': typeof AuthLoginIndexLazyRoute
   '/users': typeof DashboardUsersIndexLazyRoute
 }
 export interface FileRoutesById {
@@ -63,7 +65,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/about': typeof AboutRoute
-  '/login/': typeof LoginIndexLazyRoute
+  '/_auth/login/': typeof AuthLoginIndexLazyRoute
   '/_dashboard/users/': typeof DashboardUsersIndexLazyRoute
 }
 export interface FileRouteTypes {
@@ -76,7 +78,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_dashboard'
     | '/about'
-    | '/login/'
+    | '/_auth/login/'
     | '/_dashboard/users/'
   fileRoutesById: FileRoutesById
 }
@@ -84,7 +86,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   AboutRoute: typeof AboutRoute
-  LoginIndexLazyRoute: typeof LoginIndexLazyRoute
+  AuthLoginIndexLazyRoute: typeof AuthLoginIndexLazyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -110,19 +112,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginIndexLazyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_dashboard/users/': {
       id: '/_dashboard/users/'
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof DashboardUsersIndexLazyRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/_auth/login/': {
+      id: '/_auth/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginIndexLazyRouteImport
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -143,7 +145,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   AboutRoute: AboutRoute,
-  LoginIndexLazyRoute: LoginIndexLazyRoute,
+  AuthLoginIndexLazyRoute: AuthLoginIndexLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
