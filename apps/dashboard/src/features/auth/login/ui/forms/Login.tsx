@@ -65,7 +65,11 @@ export const LoginForm = () => {
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                     children={([canSubmit, isSubmitting]) => (
-                        <Button type="submit" disabled={!canSubmit} className="w-full">
+                        <Button 
+                            type="submit" 
+                            disabled={!canSubmit} 
+                            className="w-full bg-[#11403e] hover:bg-[#0e3634] text-white h-12 text-base rounded-xl"
+                        >
                             {isSubmitting ? 'Signing In...' : 'Sign In'}
                         </Button>
                     )}
