@@ -14,6 +14,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 
 const AuthLoginIndexLazyRouteImport = createFileRoute('/_auth/login/')()
+const AuthLoginPhoneNumberOtpLazyRouteImport = createFileRoute(
+  '/_auth/login/$phoneNumber/otp',
+)()
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -27,31 +30,43 @@ const AuthLoginIndexLazyRoute = AuthLoginIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_auth/login/index.lazy').then((d) => d.Route),
 )
+const AuthLoginPhoneNumberOtpLazyRoute =
+  AuthLoginPhoneNumberOtpLazyRouteImport.update({
+    id: '/_auth/login/$phoneNumber/otp',
+    path: '/login/$phoneNumber/otp',
+    getParentRoute: () => rootRouteImport,
+  } as any).lazy(() =>
+    import('./routes/_auth/login/$phoneNumber.otp.lazy').then((d) => d.Route),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginIndexLazyRoute
+  '/login/$phoneNumber/otp': typeof AuthLoginPhoneNumberOtpLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof AuthLoginIndexLazyRoute
+  '/login/$phoneNumber/otp': typeof AuthLoginPhoneNumberOtpLazyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_auth/login/': typeof AuthLoginIndexLazyRoute
+  '/_auth/login/$phoneNumber/otp': typeof AuthLoginPhoneNumberOtpLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths: '/' | '/login' | '/login/$phoneNumber/otp'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/_auth/login/'
+  to: '/' | '/login' | '/login/$phoneNumber/otp'
+  id: '__root__' | '/' | '/_auth/login/' | '/_auth/login/$phoneNumber/otp'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthLoginIndexLazyRoute: typeof AuthLoginIndexLazyRoute
+  AuthLoginPhoneNumberOtpLazyRoute: typeof AuthLoginPhoneNumberOtpLazyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -70,12 +85,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginIndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/login/$phoneNumber/otp': {
+      id: '/_auth/login/$phoneNumber/otp'
+      path: '/login/$phoneNumber/otp'
+      fullPath: '/login/$phoneNumber/otp'
+      preLoaderRoute: typeof AuthLoginPhoneNumberOtpLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthLoginIndexLazyRoute: AuthLoginIndexLazyRoute,
+  AuthLoginPhoneNumberOtpLazyRoute: AuthLoginPhoneNumberOtpLazyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

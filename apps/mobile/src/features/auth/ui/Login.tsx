@@ -13,7 +13,13 @@ import { LogIn, Phone } from "lucide-react";
 export const LoginForm = () => {
     const { form } = useLoginForm();
     return (
-        <form>
+        <form
+            onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+            }}
+        >
             <FieldGroup>
                 <FieldSet>
                     <form.Field
