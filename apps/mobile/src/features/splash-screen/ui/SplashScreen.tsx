@@ -1,13 +1,14 @@
 import { appEnv } from "@/shared/utils/appEnv";
 import "../styles/styles.css";
+import { Logo } from "@/shared/ui/components/Logo";
 
 export const SplashScreen = () => {
     return (
         <div className="h-screen w-screen flex items-center justify-center flex-col gap-2 overflow-hidden">
-            <img
+            <Logo
                 src="https://picsum.dev/256/256"
                 alt="Splash Screen"
-                className="w-16 h-16 p-1 border border-gray-300 rounded-full iconSplash"
+                className="i"
             />
             <div className="flex flex-col items-center titleSplash">
                 <p className="text-xl font-bold text-primary">
