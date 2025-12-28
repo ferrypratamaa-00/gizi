@@ -18,9 +18,35 @@ function RouteComponent() {
                 />
             </div>
 
-            {/* Form */}
-            <div className="mt-16 w-full max-w-sm px-4">
+            {/* Content Container */}
+            <div className="mt-12 w-full max-w-sm px-6 flex flex-col gap-6">
+                {/* Welcome Text */}
+                <div className="text-center space-y-1">
+                    <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                        Selamat Datang!
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                        Silahkan masuk untuk melanjutkan perjalanan sehatmu.
+                    </p>
+                </div>
+
+                {/* Form */}
                 <LoginForm />
+            </div>
+
+            {/* Footer Terms */}
+            <div className="mt-auto mb-8 text-center px-8">
+                <p className="text-xs text-gray-400 leading-relaxed">
+                    Dengan masuk, Anda menyetujui <br />
+                    <span className="underline cursor-pointer">
+                        Syarat & Ketentuan
+                    </span>{" "}
+                    serta{" "}
+                    <span className="underline cursor-pointer">
+                        Kebijakan Privasi
+                    </span>{" "}
+                    kami.
+                </p>
             </div>
         </div>
     );
