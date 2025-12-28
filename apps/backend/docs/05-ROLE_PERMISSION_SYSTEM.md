@@ -798,4 +798,302 @@ export async function getEffectivePermissions(
 
 ---
 
+## 🚀 **REVISED: Scalable Permission System** (Recommended for Production)
+
+> **Version 2.0** - Policy-Based Approach to prevent permission explosion
+
+### ⚠️ Problem with Traditional RBAC
+
+The permission matrix above can lead to **permission explosion**:
+
+```typescript
+// ❌ Anti-Pattern: Permission explosion
+// 50+ permissions × 10 roles = 500+ mappings in database
+roles_permissions table:
+- TENANT_ADMIN → [users:read, users:write, users:delete, children:read, ...]
+- UNIT_ADMIN → [users:read, children:read, children:write, ...]
+// Every new resource = update 10 roles
+```
+
+**Issues**:
+
+- 🔴 Permissions membengkak (hard to maintain)
+- 🔴 Inconsistent (lupa assign ke role tertentu)
+- 🔴 Susah scale (tiap resource baru butuh banyak mapping)
+
+---
+
+### ✅ Solution: Resource-Based Policy Pattern
+
+**Core Concept**: Permissions defined in **code** (type-safe, versioned), bukan di database.
+
+**File**: `src/modules/auth/domain/policies/role-policies.ts`
+
+```typescript
+export type Action = "read" | "write" | "delete" | "approve" | "export";
+export type Resource =
+    | "users"
+    | "children"
+    | "measurements"
+    | "reports"
+    | "tenants"
+    | "units"
+    | "regions";
+
+export interface RolePolicy {
+    role: string;
+    permissions: {
+        [resource in Resource]?: Action[];
+    };
+    scope: "global" | "tenant" | "unit" | "region" | "self";
+}
+
+export const ROLE_POLICIES: Record<string, RolePolicy> = {
+    SUPER_ADMIN: {
+        role: "SUPER_ADMIN",
+        permissions: {
+            "*": ["read", "write", "delete", "approve", "export"], // All
+        },
+        scope: "global",
+    },
+
+    TENANT_ADMIN: {
+        role: "TENANT_ADMIN",
+        permissions: {
+            users: ["read", "write", "delete"],
+            children: ["read", "write", "delete"],
+            measurements: ["read", "write", "approve"],
+            reports: ["read", "export"],
+            units: ["read", "write"],
+            regions: ["read", "write"],
+        },
+        scope: "tenant",
+    },
+
+    UNIT_ADMIN: {
+        role: "UNIT_ADMIN",
+        permissions: {
+            users: ["read", "write"], // Only Kader in their unit
+            children: ["read", "write"],
+            measurements: ["read", "write", "approve"],
+            reports: ["read"],
+        },
+        scope: "unit",
+    },
+
+    KADER: {
+        role: "KADER",
+        permissions: {
+            children: ["read", "write"],
+            measurements: ["write"], // No approve
+        },
+        scope: "unit",
+    },
+
+    VILLAGE_HEAD: {
+        role: "VILLAGE_HEAD",
+        permissions: {
+            children: ["read"],
+            measurements: ["read"],
+            reports: ["read", "export"],
+        },
+        scope: "region",
+    },
+
+    PARENT: {
+        role: "PARENT",
+        permissions: {
+            children: ["read"], // Own children only
+            measurements: ["read"],
+        },
+        scope: "self",
+    },
+};
+```
+
+---
+
+### Permission Check Service
+
+**File**: `src/modules/auth/domain/services/PermissionService.ts`
+
+```typescript
+export class PermissionService {
+    hasPermission(
+        user: User,
+        resource: Resource,
+        action: Action,
+        resourceData?: any // For scope checking
+    ): boolean {
+        // 1. Get role policy
+        const policy = ROLE_POLICIES[user.role.getValue()];
+        if (!policy) return false;
+
+        // 2. Super Admin bypass
+        if (user.isSuperAdmin()) return true;
+
+        // 3. Check action allowed for resource
+        const allowedActions =
+            policy.permissions[resource] || policy.permissions["*"];
+        if (!allowedActions || !allowedActions.includes(action)) {
+            return false;
+        }
+
+        // 4. Check scope
+        return this.checkScope(user, policy.scope, resourceData);
+    }
+
+    private checkScope(
+        user: User,
+        scope: RolePolicy["scope"],
+        resourceData?: any
+    ): boolean {
+        switch (scope) {
+            case "global":
+                return true;
+            case "tenant":
+                return resourceData?.tenantId === user.tenantId?.getValue();
+            case "unit":
+                return (
+                    resourceData?.tenantId === user.tenantId?.getValue() &&
+                    resourceData?.unitId === user.scopeUnitId
+                );
+            case "region":
+                return (
+                    resourceData?.tenantId === user.tenantId?.getValue() &&
+                    resourceData?.regionId === user.scopeRegionId
+                );
+            case "self":
+                return resourceData?.userId === user.id.getValue();
+            default:
+                return false;
+        }
+    }
+}
+```
+
+---
+
+### Usage in Use Cases
+
+```typescript
+export class CreateChildUseCase {
+    async execute(input: CreateChildInput, currentUser: User): Promise<Child> {
+        // Permission check
+        if (
+            !this.permissionService.hasPermission(
+                currentUser,
+                "children",
+                "write"
+            )
+        ) {
+            throw new PermissionDeniedError("Cannot create children records");
+        }
+
+        // Create with auto-scoped data
+        const child = await this.childRepo.create({
+            ...input,
+            tenantId: currentUser.tenantId,
+            unitId: currentUser.scopeUnitId, // Auto-set if KADER
+        });
+
+        return child;
+    }
+}
+```
+
+---
+
+### Usage in Middleware
+
+```typescript
+// Generic permission middleware
+export function requirePermission(resource: Resource, action: Action) {
+    return async (c: Context, next: Next) => {
+        const user = c.get("user");
+
+        if (!permissionService.hasPermission(user, resource, action)) {
+            throw new PermissionDeniedError(`Cannot ${action} ${resource}`);
+        }
+
+        await next();
+    };
+}
+
+// Usage
+app.post(
+    "/children",
+    authenticate,
+    requirePermission("children", "write"),
+    createChildController
+);
+```
+
+---
+
+### Database Schema Changes
+
+**Remove these tables** (permissions now code-based):
+
+- ❌ `permissions` table
+- ❌ `role_permissions` table
+
+**Keep** (optional for edge cases):
+
+- ✅ `user_permissions` table (untuk per-user override jika absolutely necessary)
+
+**Add to `tenants` table** (for tenant-specific customization):
+
+```typescript
+tenants {
+  // ...existing fields
+  features: jsonb('features').$type<{
+    enabledResources?: Resource[];
+    disabledActions?: {
+      [resource in Resource]?: Action[];
+    };
+  }>(),
+}
+```
+
+---
+
+### Benefits of Policy-Based Approach
+
+| Aspect               | Old (RBAC)                            | New (Policy-Based)       |
+| -------------------- | ------------------------------------- | ------------------------ |
+| **Permission count** | 50+                                   | ~7 resources × 5 actions |
+| **DB tables**        | 3 tables                              | 0 tables (code-based)    |
+| **Add new role**     | DB insert + 20+ mappings              | Add to `ROLE_POLICIES`   |
+| **Add new resource** | Create permissions + map to all roles | Update relevant policies |
+| **Permission check** | DB query (slow)                       | In-memory (fast)         |
+| **Type safety**      | None                                  | Full TypeScript          |
+| **Maintainability**  | Complex                               | Simple                   |
+
+---
+
+### Migration Path
+
+If you already started with RBAC:
+
+1. Export existing `role_permissions` to `ROLE_POLICIES` constant
+2. Test new `PermissionService` logic
+3. Remove DB tables
+4. Deploy
+
+---
+
+### Recommendation
+
+✅ **Use Policy-Based Approach** untuk production:
+
+- Faster (no DB query)
+- Scalable (add role = add to code)
+- Type-safe (TypeScript autocomplete)
+- Versioned (tracked in git)
+
+**Exception**: Keep `user_permissions` table ONLY if you need per-user overrides (rare).
+
+---
+
 **Next**: Implement this design in Infrastructure & Interface layer!

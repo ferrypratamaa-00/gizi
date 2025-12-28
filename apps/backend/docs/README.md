@@ -28,14 +28,14 @@ Jika kamu developer yang baru join project:
 
 ### Implementation Guides
 
-| Document                                   | Description                                                       | Status         |
-| ------------------------------------------ | ----------------------------------------------------------------- | -------------- |
-| [02-DOMAIN_LAYER.md](./02-DOMAIN_LAYER.md) | 🏛️ Value Objects, Entities, Repository Interfaces, Business Rules | ✅ Complete    |
-| [03-USE_CASES.md](./03-USE_CASES.md)       | 🎯 Application Layer - Use Cases dengan flow diagrams             | ✅ Complete    |
-| [04-SETUP_GUIDE.md](./04-SETUP_GUIDE.md)   | 🚀 Step-by-step setup untuk development environment               | ✅ Complete    |
-| 05-INFRASTRUCTURE.md                       | 🔧 Repository implementations, Supabase integration, services     | 🚧 Coming Soon |
-| 06-API_SPECIFICATION.md                    | 🌐 API endpoints, controllers, middleware, error handling         | 🚧 Coming Soon |
-| 07-TESTING_GUIDE.md                        | 🧪 Test cases, scenarios, testing strategy                        | 🚧 Coming Soon |
+| Document                                                       | Description                                                       | Status      |
+| -------------------------------------------------------------- | ----------------------------------------------------------------- | ----------- |
+| [02-DOMAIN_LAYER.md](./02-DOMAIN_LAYER.md)                     | 🏛️ Value Objects, Entities, Repository Interfaces, Business Rules | ✅ Complete |
+| [03-USE_CASES.md](./03-USE_CASES.md)                           | 🎯 Application Layer - Use Cases dengan flow diagrams             | ✅ Complete |
+| [04-SETUP_GUIDE.md](./04-SETUP_GUIDE.md)                       | 🚀 Step-by-step setup untuk development environment               | ✅ Complete |
+| [05-ROLE_PERMISSION_SYSTEM.md](./05-ROLE_PERMISSION_SYSTEM.md) | 🔐 Role matrix, policy-based permissions, scalable design         | ✅ Complete |
+| [06-OTP_AUTHENTICATION.md](./06-OTP_AUTHENTICATION.md)         | 📱 OTP/WhatsApp authentication untuk Parent & Kader               | ✅ Complete |
+| [08-IMPLEMENTATION_GUIDE.md](./08-IMPLEMENTATION_GUIDE.md)     | 🛠️ Complete step-by-step implementation dengan code examples      | ✅ Complete |
 
 ---
 
