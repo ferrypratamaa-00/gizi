@@ -21,19 +21,19 @@ export const LoginForm = () => {
                     </FieldDescription>
 
                     <FieldGroup>
-                        {/* Field Email */}
+                        {/* Field ID */}
                         <form.Field
-                            name="email"
+                            name="tenantId"
                             children={(field) => (
                                 <Field>
-                                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                                    <FieldLabel htmlFor={field.name}>Tenant ID</FieldLabel>
                                     <Input
                                         id={field.name}
                                         name={field.name}
                                         value={field.state.value}
                                         onBlur={field.handleBlur}
                                         onChange={(e) => field.handleChange(e.target.value)}
-                                        placeholder="email@example.com"
+                                        placeholder="Enter Your Tenant ID"
                                     />
                                     <FieldError errors={field.state.meta.errors} />
                                 </Field>
@@ -70,7 +70,7 @@ export const LoginForm = () => {
                             disabled={!canSubmit} 
                             className="w-full bg-primary hover:bg-secondary-foreground text-white h-12 text-base rounded-xl"
                         >
-                            {isSubmitting ? 'Signing In...' : 'Sign In'}
+                            {isSubmitting ? 'Masuk...' : 'Masuk'}
                         </Button>
                     )}
                 />
