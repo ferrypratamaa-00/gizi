@@ -18,6 +18,9 @@ import { Route as IndexRouteImport } from './routes/index'
 const DashboardUsersIndexLazyRouteImport =
   createFileRoute('/_dashboard/users/')()
 const AuthLoginIndexLazyRouteImport = createFileRoute('/_auth/login/')()
+const AuthForgotPasswordIndexLazyRouteImport = createFileRoute(
+  '/_auth/forgot-password/',
+)()
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -47,16 +50,26 @@ const AuthLoginIndexLazyRoute = AuthLoginIndexLazyRouteImport.update({
 } as any).lazy(() =>
   import('./routes/_auth/login/index.lazy').then((d) => d.Route),
 )
+const AuthForgotPasswordIndexLazyRoute =
+  AuthForgotPasswordIndexLazyRouteImport.update({
+    id: '/_auth/forgot-password/',
+    path: '/forgot-password/',
+    getParentRoute: () => rootRouteImport,
+  } as any).lazy(() =>
+    import('./routes/_auth/forgot-password/index.lazy').then((d) => d.Route),
+  )
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof AuthForgotPasswordIndexLazyRoute
   '/login': typeof AuthLoginIndexLazyRoute
   '/users': typeof DashboardUsersIndexLazyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/forgot-password': typeof AuthForgotPasswordIndexLazyRoute
   '/login': typeof AuthLoginIndexLazyRoute
   '/users': typeof DashboardUsersIndexLazyRoute
 }
@@ -65,19 +78,21 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_dashboard': typeof DashboardRouteWithChildren
   '/about': typeof AboutRoute
+  '/_auth/forgot-password/': typeof AuthForgotPasswordIndexLazyRoute
   '/_auth/login/': typeof AuthLoginIndexLazyRoute
   '/_dashboard/users/': typeof DashboardUsersIndexLazyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/login' | '/users'
+  fullPaths: '/' | '/about' | '/forgot-password' | '/login' | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/login' | '/users'
+  to: '/' | '/about' | '/forgot-password' | '/login' | '/users'
   id:
     | '__root__'
     | '/'
     | '/_dashboard'
     | '/about'
+    | '/_auth/forgot-password/'
     | '/_auth/login/'
     | '/_dashboard/users/'
   fileRoutesById: FileRoutesById
@@ -86,6 +101,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   AboutRoute: typeof AboutRoute
+  AuthForgotPasswordIndexLazyRoute: typeof AuthForgotPasswordIndexLazyRoute
   AuthLoginIndexLazyRoute: typeof AuthLoginIndexLazyRoute
 }
 
@@ -126,6 +142,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginIndexLazyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/forgot-password/': {
+      id: '/_auth/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordIndexLazyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -145,6 +168,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
   AboutRoute: AboutRoute,
+  AuthForgotPasswordIndexLazyRoute: AuthForgotPasswordIndexLazyRoute,
   AuthLoginIndexLazyRoute: AuthLoginIndexLazyRoute,
 }
 export const routeTree = rootRouteImport

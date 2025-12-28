@@ -26,17 +26,17 @@ function RouteComponent() {
       </div>
 
       {/* Right Panel - Visual */}
-      <div className='hidden lg:flex w-1/2 bg-[#053d2e] relative items-center justify-center overflow-hidden p-12'>
+      <div className='hidden lg:flex w-1/2 bg-primary relative items-center justify-center overflow-hidden p-12'>
         {/* Abstract Background Blur */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#0c5a45] rounded-full blur-[100px] opacity-50 translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-[#0c5a45] rounded-full blur-[80px] opacity-40 -translate-x-1/3 translate-y-1/3" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary rounded-full blur-[100px] opacity-50 translate-x-1/2 -translate-y-1/2" />
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary rounded-full blur-[80px] opacity-40 -translate-x-1/3 translate-y-1/3" />
 
         <div className='relative z-10 flex flex-col items-center text-center max-w-lg'>
-          <h2 className='text-5xl md:text-6xl font-serif text-white mb-4 leading-tight'>
-            Enter the <i className='font-sans font-light opacity-90'>Future</i>
+          <h2 className='text-5xl md:text-6xl font-serif text-white leading-tight'>
+            Masuk <i className='font-sans font-light opacity-90'>Masa Depan</i>
           </h2>
-          <p className='text-3xl font-light text-white/80 mb-12'>
-             of Nutrition Monitoring, <br/> <strong className='text-white'>today</strong>
+          <p className='text-3xl font-light text-white/80 mb-6'>
+             dari pemantauan Nutrisi, <br/> <strong className='text-white'>Hari ini</strong>
           </p>
 
           {/* Card UI Visual */}

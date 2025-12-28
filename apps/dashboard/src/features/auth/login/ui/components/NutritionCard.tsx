@@ -10,12 +10,12 @@ export const NutritionCard = () => {
                 
                 <div className='space-y-1'>
                     <div className="text-3xl font-bold text-gray-900">1,204 <span className='text-sm font-normal text-gray-500'>kcal</span></div>
-                    <div className="text-sm text-green-600 font-medium">+12% vs yesterday</div>
+                    <div className="text-sm text-secondary font-medium">+12% vs yesterday</div>
                 </div>
 
                 <div className="space-y-4">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                        <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-700">🥑</div>
+                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-green-700">🥑</div>
                          <div>
                             <div className="text-sm font-bold text-gray-900">Lunch</div>
                             <div className="text-xs text-gray-500">Avocado Salad</div>
@@ -26,7 +26,7 @@ export const NutritionCard = () => {
 
                 <div className="flex justify-between items-center pt-4 border-t border-gray-100">
                     <div className="text-xs text-gray-400">Daily Goal</div>
-                    <div className="text-xs font-bold text-[#053d2e]">View Report</div>
+                    <div className="text-xs font-bold text-secondary">View Report</div>
                 </div>
              </div>
           </div>

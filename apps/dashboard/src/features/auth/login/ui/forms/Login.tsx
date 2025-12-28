@@ -15,9 +15,9 @@ export const LoginForm = () => {
         >
             <FieldGroup>
                 <FieldSet>
-                    <FieldLegend className='text-3xl font-bold'>Welcome Back</FieldLegend>
+                    <FieldLegend className='text-3xl font-bold'>Selamat Datang Kembali</FieldLegend>
                     <FieldDescription>
-                        Enter your credentials to access your account
+                        Masukkan kredensial Anda untuk masuk ke dalam aplikasi
                     </FieldDescription>
 
                     <FieldGroup>
@@ -68,7 +68,7 @@ export const LoginForm = () => {
                         <Button 
                             type="submit" 
                             disabled={!canSubmit} 
-                            className="w-full bg-[#11403e] hover:bg-[#0e3634] text-white h-12 text-base rounded-xl"
+                            className="w-full bg-primary hover:bg-secondary-foreground text-white h-12 text-base rounded-xl"
                         >
                             {isSubmitting ? 'Signing In...' : 'Sign In'}
                         </Button>
