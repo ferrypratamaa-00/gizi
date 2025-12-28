@@ -1,0 +1,33 @@
+.iconSplash {
+    animation: iconMove 500ms ease-out;
+}
+
+.titleSplash {
+    animation: textUp 400ms ease-out;
+    animation-delay: 120ms;
+    animation-fill-mode: both;
+}
+
+@keyframes iconMove {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes textUp {
+    from {
+        transform: translateY(24px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
