@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from '@tanstack/react-router'
+import { createLazyFileRoute, Link } from '@tanstack/react-router'
 import { LoginForm } from '@/features/auth/login/ui/forms/Login'
 import { Logo } from '@/features/auth/login/ui/components/Logo'
 import { NutritionCard } from '@/features/auth/login/ui/components/NutritionCard'
@@ -18,6 +18,7 @@ function RouteComponent() {
           <Logo />
           {/* Login Form */}
           <LoginForm />
+          <Link to={"/forgot-password"} className='text-sm text-secondary'>Lupa Password?</Link>
         </div>
         {/* Footer */}
         <div className='absolute bottom-8 text-sm text-gray-500'>
