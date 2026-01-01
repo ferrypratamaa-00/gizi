@@ -1,0 +1,1 @@
+DROP INDEX "refresh_tokens_unique";

@@ -31,7 +31,6 @@ export const refreshTokens = pgTable(
         revokedAt: timestamp("revoked_at"),
     },
     (table) => [
-        uniqueIndex("refresh_tokens_unique").on(table.token),
         index("idx_refresh_tokens_token").on(table.token),
         index("idx_refresh_tokens_user_id").on(table.userId),
         index("idx_refresh_tokens_not_revoked")
