@@ -36,4 +36,4 @@ export const auditLogs = pgTable(
         index("idx_audit_logs_resource").on(table.resource),
         index("idx_audit_logs_created_at").on(table.createdAt),
     ]
-);
+).enableRLS();

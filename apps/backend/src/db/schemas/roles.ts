@@ -16,4 +16,4 @@ export const roles = pgTable("roles", {
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     deletedAt: timestamp("deleted_at"),
-});
+}).enableRLS();

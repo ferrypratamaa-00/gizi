@@ -39,4 +39,4 @@ export const refreshTokens = pgTable(
             .where(sql`${table.revoked} = false`),
         index("idx_refresh_tokens_expires_at").on(table.expiresAt),
     ]
-);
+).enableRLS();

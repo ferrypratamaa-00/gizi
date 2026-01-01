@@ -33,4 +33,4 @@ export const userPermissions = pgTable(
         index("idx_user_permissions_user_id").on(table.userId),
         index("idx_user_permissions_permission_id").on(table.permissionId),
     ]
-);
+).enableRLS();

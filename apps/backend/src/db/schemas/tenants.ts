@@ -34,4 +34,4 @@ export const tenants = pgTable(
         index("idx_tenants_subscription_status").on(table.subscriptionStatus),
         index("idx_tenants_deleted_at").on(table.deletedAt),
     ]
-);
+).enableRLS();

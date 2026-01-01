@@ -9,4 +9,4 @@ export const permissions = pgTable("permissions", {
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
     deletedAt: timestamp("deleted_at"),
-});
+}).enableRLS();

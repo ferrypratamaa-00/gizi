@@ -40,4 +40,4 @@ export const users = pgTable(
         index("idx_users_scope_region_id").on(table.scopeRegionId),
         index("idx_users_deleted_at").on(table.deletedAt),
     ]
-);
+).enableRLS();

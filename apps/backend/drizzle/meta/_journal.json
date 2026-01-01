@@ -8,6 +8,13 @@
       "when": 1767265624204,
       "tag": "0000_salty_vance_astro",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1767276869109,
+      "tag": "0001_cynical_karnak",
+      "breakpoints": true
     }
   ]
 }
