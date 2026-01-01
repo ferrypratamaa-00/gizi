@@ -260,30 +260,30 @@ export class TenantId {
 **File**: `src/modules/auth/domain/value-objects/Role.vo.ts`
 
 ```typescript
-export enum RoleEnum {
-    SUPER_ADMIN = "SUPER_ADMIN",
-    SUPPORT_STAFF = "SUPPORT_STAFF",
-    TENANT_ADMIN = "TENANT_ADMIN",
-    TENANT_HEAD = "TENANT_HEAD",
-    UNIT_ADMIN = "UNIT_ADMIN",
-    UNIT_HEAD = "UNIT_HEAD",
-    KADER = "KADER",
-    VILLAGE_HEAD = "VILLAGE_HEAD",
-    DISTRICT_HEAD = "DISTRICT_HEAD",
-    PARENT = "PARENT",
-}
-
+/**
+ * Role Value Object
+ *
+ * Represents a user's role name as a simple value object.
+ * Role details (category, level, permissions) are managed by RoleEntity
+ * and fetched from the database, not hardcoded here.
+ */
 export class Role {
-    private readonly value: RoleEnum;
+    private readonly value: string;
 
     constructor(role: string) {
-        if (!Object.values(RoleEnum).includes(role as RoleEnum)) {
-            throw new InvalidRoleError(role);
+        if (!role || role.trim().length === 0) {
+            throw new Error("Role cannot be empty");
         }
-        this.value = role as RoleEnum;
+
+        if (role.length > 255) {
+            throw new Error("Role name too long (max 255 characters)");
+        }
+
+        // Store as uppercase for consistency
+        this.value = role.trim().toUpperCase();
     }
 
-    getValue(): RoleEnum {
+    getValue(): string {
         return this.value;
     }
 
@@ -294,32 +294,34 @@ export class Role {
     toString(): string {
         return this.value;
     }
+}
+```
 
-    // Helper methods
+**Design Decision: Dynamic Roles ✅**
+
+Role VO ini **tidak hardcode enum** karena:
+
+1. ✅ **Database-driven**: Role definitions ada di database table `roles` dengan field `name`, `category`, `level`
+2. ✅ **Scalable**: Tambah role baru cukup insert ke DB, tidak perlu update code
+3. ✅ **Single Source of Truth**: Category logic ada di `RoleEntity` yang fetch dari DB
+
+**Category logic ada di Entity/Service, bukan di VO**:
+
+```typescript
+// Example: RoleEntity.ts
+export class RoleEntity {
+    constructor(
+        private name: string,
+        private category: string, // From DB: PLATFORM, TENANT, UNIT, etc.
+        private level: number
+    ) {}
+
     isPlatformLevel(): boolean {
-        return [RoleEnum.SUPER_ADMIN, RoleEnum.SUPPORT_STAFF].includes(
-            this.value
-        );
+        return this.category === "PLATFORM";
     }
 
     isTenantLevel(): boolean {
-        return [RoleEnum.TENANT_ADMIN, RoleEnum.TENANT_HEAD].includes(
-            this.value
-        );
-    }
-
-    isUnitLevel(): boolean {
-        return [
-            RoleEnum.UNIT_ADMIN,
-            RoleEnum.UNIT_HEAD,
-            RoleEnum.KADER,
-        ].includes(this.value);
-    }
-
-    isTerritoryLevel(): boolean {
-        return [RoleEnum.VILLAGE_HEAD, RoleEnum.DISTRICT_HEAD].includes(
-            this.value
-        );
+        return this.category === "TENANT";
     }
 }
 ```
