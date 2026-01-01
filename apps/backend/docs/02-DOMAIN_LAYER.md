@@ -221,20 +221,20 @@ export class Password {
 **File**: `src/modules/auth/domain/value-objects/TenantId.vo.ts`
 
 ```typescript
-import { v4 as uuidv4, validate as uuidValidate } from "uuid";
+import { generateUUID, isValidUUID } from "@/core/utils/uuid";
 
 export class TenantId {
     private readonly value: string;
 
     constructor(id: string) {
-        if (!uuidValidate(id)) {
-            throw new InvalidTenantIdError(id);
+        if (!isValidUUID(id)) {
+            throw new Error(`Invalid TenantId: ${id}`);
         }
         this.value = id;
     }
 
     static generate(): TenantId {
-        return new TenantId(uuidv4());
+        return new TenantId(generateUUID());
     }
 
     getValue(): string {
@@ -251,9 +251,45 @@ export class TenantId {
 }
 ```
 
-**`UserId`** - sama dengan `TenantId` (copy paste, ganti nama)
+**File**: `src/modules/auth/domain/value-objects/UserId.vo.ts`
 
----
+```typescript
+import { generateUUID, isValidUUID } from "@/core/utils/uuid";
+
+export class UserId {
+    private readonly value: string;
+
+    constructor(id: string) {
+        if (!isValidUUID(id)) {
+            throw new Error(`Invalid UserId: ${id}`);
+        }
+        this.value = id;
+    }
+
+    static generate(): UserId {
+        return new UserId(generateUUID());
+    }
+
+    getValue(): string {
+        return this.value;
+    }
+
+    equals(other: UserId): boolean {
+        return this.value === other.value;
+    }
+
+    toString(): string {
+        return this.value;
+    }
+}
+```
+
+**Design Notes** ✅:
+
+- Uses **UUID v7** (via `generateUUID()` from Bun native)
+- UUID v7 is **time-ordered** (better for database performance)
+- No external dependencies (`uuid` package not needed)
+- Both ValueObjects have identical structure (strongly-typed IDs)
 
 ### 4. `Role` Value Object
 
@@ -426,7 +462,9 @@ export interface UserProps {
     supabaseAuthId: string;
     email: Email;
     fullName: string;
-    role: Role;
+    role: Role; // Role name (string)
+    roleCategory: string; // PLATFORM | TENANT | UNIT | TERRITORY | PUBLIC (from DB)
+    roleLevel: number; // 1-9, lower = higher privilege (from DB)
     permissions: Permission[]; // Effective permissions (role default + user override)
     scopeUnitId?: string | null;
     scopeRegionId?: string | null;
@@ -449,42 +487,23 @@ export class User {
         return this.props.id;
     }
 
-    get tenantId(): TenantId | null {
-        return this.props.tenantId;
-    }
-
-    get email(): Email {
-        return this.props.email;
-    }
-
     get role(): Role {
         return this.props.role;
     }
 
-    get permissions(): Permission[] {
-        return this.props.permissions;
+    get roleCategory(): string {
+        return this.props.roleCategory;
     }
 
-    get scopeUnitId(): string | null | undefined {
-        return this.props.scopeUnitId;
-    }
-
-    get scopeRegionId(): string | null | undefined {
-        return this.props.scopeRegionId;
-    }
-
-    get isActive(): boolean {
-        return this.props.isActive;
+    get roleLevel(): number {
+        return this.props.roleLevel;
     }
 
     // Business Methods
 
-    /**
-     * Check apakah user bisa akses tenant tertentu
-     */
     canAccessTenant(tenantId: TenantId): boolean {
         // Platform admin bisa akses semua tenant
-        if (this.role.isPlatformLevel()) {
+        if (this.roleCategory === "PLATFORM") {
             return true;
         }
 
@@ -492,121 +511,72 @@ export class User {
         return this.tenantId?.equals(tenantId) ?? false;
     }
 
-    /**
-     * Check apakah user punya permission tertentu
-     */
     hasPermission(permission: Permission): boolean {
         // Super admin punya semua permission
-        if (this.role.getValue() === RoleEnum.SUPER_ADMIN) {
+        if (this.isSuperAdmin()) {
             return true;
         }
 
         return this.permissions.some((p) => p.equals(permission));
     }
 
-    /**
-     * Check apakah resource dalam scope unit user
-     */
-    isInUnitScope(unitId: string): boolean {
-        // No scope = bisa akses semua unit (tenant admin)
-        if (!this.scopeUnitId) {
-            return true;
-        }
-
-        return this.scopeUnitId === unitId;
-    }
-
-    /**
-     * Check apakah resource dalam scope region user
-     */
-    isInRegionScope(regionId: string): boolean {
-        // No scope = bisa akses semua region (tenant admin)
-        if (!this.scopeRegionId) {
-            return true;
-        }
-
-        return this.scopeRegionId === regionId;
-    }
-
-    /**
-     * Check apakah user adalah super admin
-     */
     isSuperAdmin(): boolean {
-        return this.role.getValue() === RoleEnum.SUPER_ADMIN;
+        return this.role.getValue() === "SUPER_ADMIN";
     }
 
-    /**
-     * Check apakah user bisa assign role ke user lain
-     */
-    canAssignRole(targetRole: Role): boolean {
+    canAssignRole(
+        targetRoleLevel: number,
+        targetRoleCategory: string
+    ): boolean {
         // Super admin bisa assign semua role
         if (this.isSuperAdmin()) {
             return true;
         }
 
-        // Tenant admin bisa assign role di bawah tenant level
-        if (this.role.getValue() === RoleEnum.TENANT_ADMIN) {
-            return targetRole.isUnitLevel() || targetRole.isTerritoryLevel();
+        // Tenant admin bisa assign role di level UNIT dan TERRITORY saja
+        if (this.role.getValue() === "TENANT_ADMIN") {
+            return ["UNIT", "TERRITORY", "PUBLIC"].includes(targetRoleCategory);
         }
 
-        // Role lain tidak bisa assign
-        return false;
+        // User hanya bisa assign role dengan level lebih rendah (angka lebih besar)
+        return this.roleLevel < targetRoleLevel;
     }
 
-    /**
-     * Activate user
-     */
-    activate(): void {
-        this.props.isActive = true;
-        this.props.updatedAt = new Date();
-    }
-
-    /**
-     * Deactivate user
-     */
-    deactivate(): void {
-        this.props.isActive = false;
-        this.props.updatedAt = new Date();
-    }
-
-    /**
-     * Change role
-     */
-    changeRole(newRole: Role): void {
-        this.props.role = newRole;
-        this.props.updatedAt = new Date();
-    }
-
-    /**
-     * Verify email
-     */
-    verifyEmail(): void {
-        this.props.emailVerified = true;
-        this.props.updatedAt = new Date();
-    }
-
-    /**
-     * Convert to plain object (untuk serialization)
-     */
-    toObject() {
-        return {
-            id: this.id.getValue(),
-            tenantId: this.tenantId?.getValue() ?? null,
-            supabaseAuthId: this.props.supabaseAuthId,
-            email: this.email.getValue(),
-            fullName: this.props.fullName,
-            role: this.role.getValue(),
-            permissions: this.permissions.map((p) => p.getValue()),
-            scopeUnitId: this.scopeUnitId,
-            scopeRegionId: this.scopeRegionId,
-            isActive: this.isActive,
-            emailVerified: this.props.emailVerified,
-            metadata: this.props.metadata,
-            createdAt: this.props.createdAt,
-            updatedAt: this.props.updatedAt,
-        };
-    }
+    // ... other methods
 }
+```
+
+**Key Changes from Original Design** ✅:
+
+1. **`roleCategory`** - From database `roles.category` field
+2. **`roleLevel`** - From database `roles.level` field (1 = highest, 9 = lowest)
+3. **No hardcoded enum** - All role logic is database-driven
+4. **Dynamic authorization** - Category checks use string comparison, not enum
+
+**Example Authorization Flow**:
+
+```typescript
+// When fetching user from DB, also fetch role details:
+const userRow = await db
+    .select({
+        ...userFields,
+        roleCategory: roles.category,
+        roleLevel: roles.level,
+    })
+    .from(users)
+    .innerJoin(roles, eq(users.role, roles.name));
+
+// Create User entity with role details
+const user = new User({
+    role: new Role(userRow.role),
+    roleCategory: userRow.roleCategory, // "PLATFORM"
+    roleLevel: userRow.roleLevel, // 1
+    // ...
+});
+
+// Now entity can check authorization
+user.canAccessTenant(tenantId); // Uses roleCategory check
+user.canAssignRole(5, "UNIT"); // Uses roleLevel hierarchy
 ```
 
 **Key Methods Explained**:
