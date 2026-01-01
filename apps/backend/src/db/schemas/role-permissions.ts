@@ -2,7 +2,6 @@ import {
     index,
     pgTable,
     timestamp,
-    unique,
     uniqueIndex,
     uuid,
 } from "drizzle-orm/pg-core";
@@ -21,16 +20,12 @@ export const rolePermissions = pgTable(
             .notNull(),
         createdAt: timestamp("created_at").notNull().defaultNow(),
     },
-    (table) => ({
-        unique: uniqueIndex("role_permissions_unique").on(
+    (table) => [
+        uniqueIndex("role_permissions_unique").on(
             table.roleId,
             table.permissionId
         ),
-        idxRolePermissionsRoleId: index("idx_role_permissions_role_id").on(
-            table.roleId
-        ),
-        idxRolePermissionsPermissionId: index(
-            "idx_role_permissions_permission_id"
-        ).on(table.permissionId),
-    })
+        index("idx_role_permissions_role_id").on(table.roleId),
+        index("idx_role_permissions_permission_id").on(table.permissionId),
+    ]
 );

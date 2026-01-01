@@ -30,19 +30,13 @@ export const refreshTokens = pgTable(
         createdAt: timestamp("created_at").notNull().defaultNow(),
         revokedAt: timestamp("revoked_at"),
     },
-    (table) => ({
-        unique: uniqueIndex("refresh_tokens_unique").on(table.token),
-        idxRefreshTokensToken: index("idx_refresh_tokens_token").on(
-            table.token
-        ),
-        idxRefreshTokensUserId: index("idx_refresh_tokens_user_id").on(
-            table.userId
-        ),
-        idxRefreshTokensNotRevoked: index("idx_refresh_tokens_not_revoked")
+    (table) => [
+        uniqueIndex("refresh_tokens_unique").on(table.token),
+        index("idx_refresh_tokens_token").on(table.token),
+        index("idx_refresh_tokens_user_id").on(table.userId),
+        index("idx_refresh_tokens_not_revoked")
             .on(table.revoked)
             .where(sql`${table.revoked} = false`),
-        idxRefreshTokensExpiresAt: index("idx_refresh_tokens_expires_at").on(
-            table.expiresAt
-        ),
-    })
+        index("idx_refresh_tokens_expires_at").on(table.expiresAt),
+    ]
 );

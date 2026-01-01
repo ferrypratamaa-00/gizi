@@ -29,11 +29,9 @@ export const tenants = pgTable(
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
         deletedAt: timestamp("deleted_at"),
     },
-    (table) => ({
-        idxTenantSlug: index("idx_tenants_slug").on(table.slug),
-        idxTenantSubscriptionStatus: index(
-            "idx_tenants_subscription_status"
-        ).on(table.subscriptionStatus),
-        idxTenantDeletedAt: index("idx_tenants_deleted_at").on(table.deletedAt),
-    })
+    (table) => [
+        index("idx_tenants_slug").on(table.slug),
+        index("idx_tenants_subscription_status").on(table.subscriptionStatus),
+        index("idx_tenants_deleted_at").on(table.deletedAt),
+    ]
 );

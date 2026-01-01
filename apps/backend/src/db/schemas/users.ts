@@ -30,23 +30,14 @@ export const users = pgTable(
         updatedAt: timestamp("updated_at").notNull().defaultNow(),
         deletedAt: timestamp("deleted_at"),
     },
-    (table) => ({
-        emailTenantUnique: uniqueIndex("email_tenant_unique").on(
-            table.email,
-            table.tenantId
-        ),
-        idxUserTenantId: index("idx_users_tenant_id").on(table.tenantId),
-        idxUserSupabaseAuthId: index("idx_users_supabase_auth_id").on(
-            table.supabaseAuthId
-        ),
-        idxUserEmail: index("idx_users_email").on(table.email),
-        idxUserRole: index("idx_users_role").on(table.role),
-        idxUserScopeUnitId: index("idx_users_scope_unit_id").on(
-            table.scopeUnitId
-        ),
-        idxUserScopeRegionId: index("idx_users_scope_region_id").on(
-            table.scopeRegionId
-        ),
-        idxUserDeletedAt: index("idx_users_deleted_at").on(table.deletedAt),
-    })
+    (table) => [
+        uniqueIndex("email_tenant_unique").on(table.email, table.tenantId),
+        index("idx_users_tenant_id").on(table.tenantId),
+        index("idx_users_supabase_auth_id").on(table.supabaseAuthId),
+        index("idx_users_email").on(table.email),
+        index("idx_users_role").on(table.role),
+        index("idx_users_scope_unit_id").on(table.scopeUnitId),
+        index("idx_users_scope_region_id").on(table.scopeRegionId),
+        index("idx_users_deleted_at").on(table.deletedAt),
+    ]
 );

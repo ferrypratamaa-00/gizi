@@ -29,17 +29,11 @@ export const auditLogs = pgTable(
 
         createdAt: timestamp("created_at").notNull().defaultNow(),
     },
-    (table) => ({
-        idxAuditLogsTenantId: index("idx_audit_logs_tenant_id").on(
-            table.tenantId
-        ),
-        idxAuditLogsUserId: index("idx_audit_logs_user_id").on(table.userId),
-        idxAuditLogsAction: index("idx_audit_logs_action").on(table.action),
-        idxAuditLogsResource: index("idx_audit_logs_resource").on(
-            table.resource
-        ),
-        idxAuditLogsCreatedAt: index("idx_audit_logs_created_at").on(
-            table.createdAt
-        ),
-    })
+    (table) => [
+        index("idx_audit_logs_tenant_id").on(table.tenantId),
+        index("idx_audit_logs_user_id").on(table.userId),
+        index("idx_audit_logs_action").on(table.action),
+        index("idx_audit_logs_resource").on(table.resource),
+        index("idx_audit_logs_created_at").on(table.createdAt),
+    ]
 );

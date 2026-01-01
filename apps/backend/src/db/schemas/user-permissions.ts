@@ -25,16 +25,12 @@ export const userPermissions = pgTable(
             .notNull(),
         grantedAt: timestamp("granted_at").notNull().defaultNow(),
     },
-    (table) => ({
-        unique: uniqueIndex("user_permissions_unique").on(
+    (table) => [
+        uniqueIndex("user_permissions_unique").on(
             table.userId,
             table.permissionId
         ),
-        idxUserPermissionsUserId: index("idx_user_permissions_user_id").on(
-            table.userId
-        ),
-        idxUserPermissionsPermissionId: index(
-            "idx_user_permissions_permission_id"
-        ).on(table.permissionId),
-    })
+        index("idx_user_permissions_user_id").on(table.userId),
+        index("idx_user_permissions_permission_id").on(table.permissionId),
+    ]
 );
