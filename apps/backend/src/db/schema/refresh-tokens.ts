@@ -9,7 +9,7 @@ import {
     varchar,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 export const refreshTokens = pgTable(
     "refresh_tokens",
@@ -40,7 +40,7 @@ export const refreshTokens = pgTable(
         ),
         idxRefreshTokensNotRevoked: index("idx_refresh_tokens_not_revoked")
             .on(table.revoked)
-            .where(eq(table.revoked, false)),
+            .where(sql`${table.revoked} = false`),
         idxRefreshTokensExpiresAt: index("idx_refresh_tokens_expires_at").on(
             table.expiresAt
         ),

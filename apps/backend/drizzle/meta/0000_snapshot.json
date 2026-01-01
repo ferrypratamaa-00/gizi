@@ -1,5 +1,5 @@
 {
-  "id": "331a89f0-ae1b-40e7-ad67-a664b44deb3f",
+  "id": "a4adc21f-7643-4189-b8b2-21ae966656d4",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -728,7 +728,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"refresh_tokens\".\"revoked\" = $1",
+          "where": "\"refresh_tokens\".\"revoked\" = false",
           "concurrently": false,
           "method": "btree",
           "with": {}

@@ -132,7 +132,7 @@ CREATE INDEX "idx_users_deleted_at" ON "users" USING btree ("deleted_at");--> st
 CREATE UNIQUE INDEX "refresh_tokens_unique" ON "refresh_tokens" USING btree ("token");--> statement-breakpoint
 CREATE INDEX "idx_refresh_tokens_token" ON "refresh_tokens" USING btree ("token");--> statement-breakpoint
 CREATE INDEX "idx_refresh_tokens_user_id" ON "refresh_tokens" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "idx_refresh_tokens_not_revoked" ON "refresh_tokens" USING btree ("revoked") WHERE "refresh_tokens"."revoked" = $1;--> statement-breakpoint
+CREATE INDEX "idx_refresh_tokens_not_revoked" ON "refresh_tokens" USING btree ("revoked") WHERE "refresh_tokens"."revoked" = false;--> statement-breakpoint
 CREATE INDEX "idx_refresh_tokens_expires_at" ON "refresh_tokens" USING btree ("expires_at");--> statement-breakpoint
 CREATE UNIQUE INDEX "role_permissions_unique" ON "role_permissions" USING btree ("role_id","permission_id");--> statement-breakpoint
 CREATE INDEX "idx_role_permissions_role_id" ON "role_permissions" USING btree ("role_id");--> statement-breakpoint
