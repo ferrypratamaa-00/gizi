@@ -1,3 +1,5 @@
+import { InvalidPermissionError } from "../errors/PermissionErrors";
+
 export class Permission {
     private readonly resource: string;
     private readonly action: string;
@@ -47,4 +49,29 @@ export class Permission {
     isDelete(): boolean {
         return this.action === "delete";
     }
+
+    isExport(): boolean {
+        return this.action === "export";
+    }
+
+    isImport(): boolean {
+        return this.action === "import";
+    }
+
+    isApprove(): boolean {
+        return this.action === "approve";
+    }
+
+    isReject(): boolean {
+        return this.action === "reject";
+    }
+
+    isAssign(): boolean {
+        return this.action === "assign";
+    }
+
+    isUnassign(): boolean {
+        return this.action === "unassign";
+    }
+
 }

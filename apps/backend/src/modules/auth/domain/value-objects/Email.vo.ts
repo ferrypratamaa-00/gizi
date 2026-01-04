@@ -1,3 +1,5 @@
+import { InvalidEmailError } from "../errors/AuthErrors";
+
 export class Email {
     private readonly value: string;
 

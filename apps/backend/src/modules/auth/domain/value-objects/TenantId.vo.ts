@@ -1,4 +1,5 @@
 import { generateUUID, isValidUUID } from "@/core/utils/uuid";
+import { InvalidTenantIdError } from "../errors/TenantErrors";
 
 export class TenantId {
     private readonly value: string;

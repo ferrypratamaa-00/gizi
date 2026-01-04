@@ -1,3 +1,5 @@
+import { WeakPasswordError } from "../errors/AuthErrors";
+
 export class Password {
     private readonly value: string;
 
