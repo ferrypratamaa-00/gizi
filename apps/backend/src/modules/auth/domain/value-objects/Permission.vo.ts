@@ -70,8 +70,8 @@ export class Permission {
         return this.action === "assign";
     }
 
-    isUnassign(): boolean {
-        return this.action === "unassign";
+    isRevoke(): boolean {
+        return this.action === "revoke";
     }
 
 }
